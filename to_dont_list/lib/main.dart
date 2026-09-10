@@ -12,8 +12,11 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  final List<Item> items = [const Item(name: "add more todos")];
+  final List<Item> items = [];
   final _itemSet = <Item>{};
+  int comicsForHero(String hero) {
+    return items.where((item) => item.hero == hero).length;
+  }
 
   void _handleListChanged(Item item, bool completed) {
     setState(() {
@@ -43,10 +46,10 @@ class _ToDoListState extends State<ToDoList> {
     });
   }
 
-  void _handleNewItem(String itemText, TextEditingController textController) {
+  void _handleNewItem(String itemText, String hero, int issueNumber, TextEditingController textController) {
     setState(() {
       print("Adding new item");
-      Item item = Item(name: itemText);
+      Item item = Item(name: itemText, hero: hero, issueNumber: issueNumber);
       items.insert(0, item);
       textController.clear();
     });
@@ -56,18 +59,18 @@ class _ToDoListState extends State<ToDoList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('To Do List'),
+          title: const Text('Comic Collection'),
         ),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          children: items.map((item) {
-            return ToDoListItem(
-              item: item,
-              completed: _itemSet.contains(item),
-              onListChanged: _handleListChanged,
-              onDeleteItem: _handleDeleteItem,
-            );
-          }).toList(),
+        body: Column(
+          children: [ 
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                'Total Comics: ${items.length}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,));
+          )].toList(),
         ),
         floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.add),
@@ -83,7 +86,7 @@ class _ToDoListState extends State<ToDoList> {
 
 void main() {
   runApp(const MaterialApp(
-    title: 'To Do List',
+    title: 'Comic Collection',
     home: ToDoList(),
   ));
 }
