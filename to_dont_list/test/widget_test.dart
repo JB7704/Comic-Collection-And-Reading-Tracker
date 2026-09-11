@@ -14,77 +14,151 @@ import 'package:to_dont_list/widgets/to_do_items.dart';
 
 void main() {
   test('Item abbreviation should be first letter', () {
-    const item = Item(name: "add more todos");
-    expect(item.abbrev(), "a");
+    const item = Item(name: "Amazing Spider-Man", hero: "Spider-Man", issueNumber: 129);
+    expect(item.abbrev(), "A");
   });
 
   // Yes, you really need the MaterialApp and Scaffold
-  testWidgets('ToDoListItem has a text', (tester) async {
+  test('Item stores comic correctly', (){
+    const item = Item(name: "Amazing Spider-Man", hero: "Spider-Man", issueNumber: 129);
+    expect(item.name, "Amazing Spider-Man");
+    expect(item.hero, "Spider-Man");
+    expect(item.issueNumber, 129);
+    }
+  );
+
+  testWidgets("Todo list displays comic title", (tester) async{ 
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: ToDoListItem(item: const Item(name: "Amazing Spider-Man", hero: "Spider-Man", issueNumber: 129), completed: false, 
+        onListChanged: (Item item, bool completed) {}, onDeleteItem: (Item item) {},
+      )
+      )));
+     expect(find.text("Amazing Spider-Man"), findsOneWidget); 
+  });
+  testWidgets('ToDoListItem displays hero and issue number', (tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-            body: ToDoListItem(
-                item: const Item(name: "test"),
-                completed: true,
-                onListChanged: (Item item, bool completed) {},
-                onDeleteItem: (Item item) {}))));
-    final textFinder = find.text('test');
-
-    // Use the `findsOneWidget` matcher provided by flutter_test to verify
-    // that the Text widgets appear exactly once in the widget tree.
-    expect(textFinder, findsOneWidget);
+          body: ToDoListItem(item: const Item(name: "Amazing Spider-Man", hero: "Spider-Man", issueNumber: 129), completed: false,
+          onListChanged: (Item item, bool completed) {}, onDeleteItem: (Item item) {},
+          ),
+        ),
+      ),
+    );
+    expect(find.text("Spider-Man - Issue #129"), findsOneWidget);
   });
 
-  testWidgets('ToDoListItem has a Circle Avatar with abbreviation',
-      (tester) async {
-    await tester.pumpWidget(MaterialApp(
+testWidgets('ToDoListItem has CircleAvatar', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
         home: Scaffold(
-            body: ToDoListItem(
-                item: const Item(name: "test"),
-                completed: true,
-                onListChanged: (Item item, bool completed) {},
-                onDeleteItem: (Item item) {}))));
-    final abbvFinder = find.text('t');
-    final avatarFinder = find.byType(CircleAvatar);
+          body: ToDoListItem(item: const Item(name: "Amazing Spider-Man", hero: "Spider-Man", issueNumber: 129), completed: false,
+            onListChanged: (Item item, bool completed) {}, onDeleteItem: (Item item) {},
+          ),
+        ),
+      ),
+    );
 
-    CircleAvatar circ = tester.firstWidget(avatarFinder);
-    Text ctext = circ.child as Text;
-
-    // Use the `findsOneWidget` matcher provided by flutter_test to verify
-    // that the Text widgets appear exactly once in the widget tree.
-    expect(abbvFinder, findsOneWidget);
-    expect(circ.backgroundColor, Colors.black54);
-    expect(ctext.data, "t");
+    expect(find.byType(CircleAvatar), findsOneWidget);
   });
 
-  testWidgets('Default ToDoList has one item', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: ToDoList()));
+testWidgets('Default comic collection starts empty', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ToDoList(),
+      ),
+    );
 
     final listItemFinder = find.byType(ToDoListItem);
 
-    expect(listItemFinder, findsOneWidget);
+    expect(listItemFinder, findsNothing);
   });
 
-  testWidgets('Clicking and Typing adds item to ToDoList', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: ToDoList()));
+  testWidgets('Default comic count is zero', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ToDoList(),
+      ),
+    );
 
-    expect(find.byType(TextField), findsNothing);
+    expect(find.text("Total Comics: 0"), findsOneWidget);
+  });
+
+  testWidgets('Add comic dialog contains three text fields', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ToDoList(),
+      ),
+    );
 
     await tester.tap(find.byType(FloatingActionButton));
-    await tester.pump(); // Pump after every action to rebuild the widgets
-    expect(find.text("hi"), findsNothing);
-
-    await tester.enterText(find.byType(TextField), 'hi');
     await tester.pump();
-    expect(find.text("hi"), findsOneWidget);
+
+    expect(find.byType(TextField), findsNWidgets(3));
+  });
+
+  testWidgets('User can add a comic', (tester) async {
+  await tester.pumpWidget(
+    const MaterialApp(
+      home: ToDoList(),
+    ),
+  );
+
+  await tester.tap(find.byType(FloatingActionButton));
+  await tester.pump();
+
+  final textFields = find.byType(TextField);
+
+  await tester.enterText(textFields.at(0), "Amazing Spider-Man");
+  await tester.enterText(textFields.at(1), "Spider-Man");
+  await tester.enterText(textFields.at(2), "129");
+
+  await tester.tap(find.byKey(const Key("OKButton")));
+  await tester.pump();
+
+  expect(find.text("Amazing Spider-Man"), findsOneWidget);
+  expect(find.text("Spider-Man - Issue #129"), findsOneWidget);
+});
+
+  testWidgets('Adding comic increases total comic count', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ToDoList(),
+      ),
+    );
+
+    expect(find.text("Total Comics: 0"), findsOneWidget);
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pump();
+
+    final textFields = find.byType(TextField);
+
+    await tester.enterText(textFields.at(0), "Batman");
+    await tester.enterText(textFields.at(1), "Batman");
+    await tester.enterText(textFields.at(2), "423");
 
     await tester.tap(find.byKey(const Key("OKButton")));
     await tester.pump();
-    expect(find.text("hi"), findsOneWidget);
 
-    final listItemFinder = find.byType(ToDoListItem);
-
-    expect(listItemFinder, findsNWidgets(2));
+    expect(find.text("Total Comics: 1"), findsOneWidget);
   });
 
-  // One to test the tap and press actions on the items?
+  testWidgets('Cancel button closes dialog without adding comic',
+      (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ToDoList(),
+      ),
+    );
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key("CancelButton")));
+    await tester.pump();
+
+    expect(find.byType(TextField), findsNothing);
+    expect(find.text("Total Comics: 0"), findsOneWidget);
+  });
 }

@@ -28,11 +28,9 @@ class _ToDoListState extends State<ToDoList> {
 
       items.remove(item);
       if (!completed) {
-        print("Completing");
         _itemSet.add(item);
         items.add(item);
       } else {
-        print("Making Undone");
         _itemSet.remove(item);
         items.insert(0, item);
       }
@@ -41,14 +39,13 @@ class _ToDoListState extends State<ToDoList> {
 
   void _handleDeleteItem(Item item) {
     setState(() {
-      print("Deleting item");
+
       items.remove(item);
     });
   }
 
   void _handleNewItem(String itemText, String hero, int issueNumber, TextEditingController textController) {
     setState(() {
-      print("Adding new item");
       Item item = Item(name: itemText, hero: hero, issueNumber: issueNumber);
       items.insert(0, item);
       textController.clear();
@@ -62,16 +59,32 @@ class _ToDoListState extends State<ToDoList> {
           title: const Text('Comic Collection'),
         ),
         body: Column(
-          children: [ 
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'Total Comics: ${items.length}',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,));
-          )].toList(),
-        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Total Comics: ${items.length}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: ListView(
+              children: items.map((item) {
+                return ToDoListItem(
+                  item: item,
+                  completed: _itemSet.contains(item),
+                  onListChanged: _handleListChanged,
+                  onDeleteItem: _handleDeleteItem,
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
         floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.add),
             onPressed: () {
