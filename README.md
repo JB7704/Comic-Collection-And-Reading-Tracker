@@ -1,2 +1,9 @@
 # Comic-Collection-And-Reading-Tracker
 This app was made to manage a comic collection and track what comics have been read. This app was made for comic collectors to track their collection. The app allows you to put in the name of the comic, the main hero, and the issue number. In the example images, the name of the comic is "Daredevil", the main hero is Daredevil, and the issue is 181. This app is very helpful when people have large collections. However, the app has places it can be improved. These places are changing the strike through when finished reading to be something smaller and to make the entries read the hero's name and when pressed display all the comics related to that hero along with displaying which have been read.
+# Empty Collection
+![Empty Comic Collection](Empty_Collection.png)
+
+# Enter Your Comic Name, Hero, And Issue
+![Adding a Comic](Comic_entry.png)
+# Comic Added To the Collection
+![Comic Collection](Comic_Collection_With_One_Comic.png)
